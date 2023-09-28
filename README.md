@@ -4,32 +4,37 @@ DAI lab: SMTP
 Objectives
 ----------
 
-In this lab, you will develop a client application (TCP) in Java. This client application will use the Socket API to communicate with a SMTP server. The code that you write will include a **partial implementation of the SMTP protocol**. These are the objectives of the lab:
+In this lab, you will develop a TCP client application in Java. This client application will use the Socket API to communicate with an SMTP server. The code that you write will include a **partial implementation of the SMTP protocol**. 
 
-* Make practical experiments to become familiar with the **SMTP protocol**. After the lab, you should be able to use a command line tool to **communicate with an SMTP server**. You should be able to send well-formed messages to the server, in order to send emails to the address of your choice.
-* Understand the notions of **test double** and **mock server**, which are useful when developing and testing a client-server application. During the lab, you will setup and use such a **mock server**.
-* Understand what it means to **implement the SMTP protocol** and be able to send e-mail messages, by working directly on top of the Socket API (i.e. you are not allowed to use a SMTP library).
-* **See how easy it is to send forged e-mails**, which appear to be sent by certain people but in reality are issued by malicious users.
-* **Design a simple object-oriented model** to implement the functional requirements described in the next paragraph.
+These are the objectives of the lab:
+
+* Implement a more complexe TCP client application in Java, which uses the Socket API to communicate with an SMTP server.
+* Make practical experiments to become familiar with the **SMTP protocol**. After the lab, you should be able to use a command line tool to communicate with an SMTP server. You should be able to send well-formed messages to the server, in order to send emails to the address of your choice.
+* Design a simple object-oriented model to implement the functional requirements described in the next paragraph.
 
 
 Functional requirements
 -----------------------
 
-Your mission is to develop a client application that automatically plays pranks on a list of victims:
+Your mission is to develop a client application that automatically plays e-mail pranks on a list of victims:
 
-* The user should be able to **define a list of victims** (concretely, you should be able to create a file containing a list of e-mail addresses).
-* The user should be able to **define how many groups of victims should be formed** in a given campaign. In every group of victims, there should be 1 sender and at least 2 recipients (i.e. the minimum size for a group is 3).
-* The user should be able to **define a list of e-mail messages**. When a prank is played on a group of victims, then one of these messages should be selected. **The mail should be sent to all group recipients, from the address of the group sender**. In other words, the recipient victims should be lead to believe that the sender victim has sent them.
+* As configuration, the user of your program should provide
+  1. the **victims list**: a file with a list of e-mail addresses,
+  2. the **messages list**: a file with several e-mail messages (subject and body),
+  3. the **number of groups** `n` on which the e-mail prank is played. This can be provided e.g., as a command line argument.
+* Your program should form `n` groups by selecting 2-5 e-mail addresses from the file for each group. The first address of the group is the sender, the others are the receivers (victims).
+* For each group, your program should select one of the e-mail messages. 
+* The respective messages are then sent to the diffent groups using the SMTP protocol.
 
 Constraints
 -----------
 
+* Your client must be implemented in Java, with the `java.io` API.
 * The goal is for you to work at the wire protocol level (with the Socket API). Therefore, you CANNOT use a library that takes care of the protocol details. You have to work with the input and output streams.
 * The program must be configurable: the addresses, groups, messages CANNOT be hard-coded in the program and MUST be managed in config files.
 * You must send **one** e-mail per group, and not one e-mail for every member of every group.
 * There must be at least a simple validation process of the input files that displays errors on the console to describe what's wrong (e.g. an invalid number of groups, an invalid e-mail address that does not contain a '@' character, an invalid format, etc.).
-* We ask you to encode the subject and the body of your e-mails (you don't have to encode the `From` and `To` contents); you can find more information [here](https://ncona.com/2011/06/using-utf-8-characters-on-an-e-mail-subject/).
+* The subject and body of the messages may contain non-ASCII characters. You have to encode the body and the subject of the e-mail correctly. You can find more information [here](https://ncona.com/2011/06/using-utf-8-characters-on-an-e-mail-subject/).
 
 
 Example
