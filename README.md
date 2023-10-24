@@ -45,11 +45,11 @@ Consider that your program generates a group G1. The group sender is Bob. The gr
 SMTP server
 -----------
 
-You can use [Mailcatcher](https://github.com/sj26/mailcatcher#docker) as a mock SMTP server for your tests.  **Do not use a real SMTP server**.
+You can use [MailDev](https://github.com/maildev/maildev) as a mock SMTP server for your tests.  **Do not use a real SMTP server**.
 
 Use docker to start the server:
 
-    docker run -p 1080:1080 -p 1025:1025 sj26/mailcatcher
+    docker run -d -p 1080:1080 -p 1025:1025 maildev/maildev
 
 This provides a Web interface on localhost:1080 and a SMTP server on localhost:1025.
 
