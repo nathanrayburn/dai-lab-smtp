@@ -8,7 +8,7 @@ In this lab, you will develop a TCP client application in Java. This client appl
 
 These are the objectives of the lab:
 
-* Implement a more complexe TCP client application in Java, which uses the Socket API to communicate with an SMTP server.
+* Implement a more complex TCP client application in Java, which uses the Socket API to communicate with an SMTP server.
 * Make practical experiments to become familiar with the **SMTP protocol**. After the lab, you should be able to use a command line tool to communicate with an SMTP server. You should be able to send well-formed messages to the server, in order to send emails to the address of your choice.
 * Design a simple object-oriented model to implement the functional requirements described in the next paragraph.
 
