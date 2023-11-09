@@ -25,7 +25,7 @@ public class Configuration {
     public Configuration(String jsonFilePath) throws Exception {
         // Lecture du contenu du fichier JSON
         String content = new String(Files.readAllBytes(Paths.get(jsonFilePath)));
-        JSONObject json = new JSONObject(content);
+
     }
 
 }
