@@ -8,14 +8,12 @@
     {
       "id": 1,
       "subject": "Test Subject 1",
-      "body": "Test this message lOl.",
-      "from": ""
+      "body": "Test this message lOl."
     },
     {
       "id": 2,
       "subject": "Test Subject 1",
-      "body": "Test this message lOl.",
-      "from": ""
+      "body": "Test this message lOl."
     }
   ]
 }
