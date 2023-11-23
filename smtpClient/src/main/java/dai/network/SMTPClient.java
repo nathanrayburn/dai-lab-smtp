@@ -51,10 +51,13 @@ public class SMTPClient {
         readResponse();
     }
 
-    public void configuration(){
+    public void configurate(){
 
         try{
             Configuration config = new Configuration("src/main/java/dai/config/config.json");
+
+            smtpPort = config.getSmtpPort();
+            smtpHost = config.getSmtpHost();
 
             if (!config.validate()) {
                 System.out.println("La configuration n'est pas valide.");

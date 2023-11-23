@@ -21,21 +21,4 @@ public class ReadJson {
         }
         return null;
     }
-
-    public Object readMessageFromJson(String pathToJson){
-
-        try(FileReader reader = new FileReader(pathToJson)){
-
-            Gson gson = new Gson();
-            Object obj = gson.fromJson(reader, Object.class);
-
-            return obj;
-
-        }catch(Exception e){
-            System.out.println("Error while reading file");
-        }
-
-        return null;
-    }
-
 }
