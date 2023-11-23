@@ -1,4 +1,4 @@
-package org.example.model;
+package dai.model;
 
 import java.util.List;
 

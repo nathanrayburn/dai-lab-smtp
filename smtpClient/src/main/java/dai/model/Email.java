@@ -1,8 +1,9 @@
-package org.example.model;
+package dai.model;
 
 import java.util.List;
 
-public class Email {
+public class
+Email {
     private String sender;
     private List<String> recipients;
     private String subject;
