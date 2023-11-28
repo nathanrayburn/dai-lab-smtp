@@ -15,11 +15,10 @@ public class Main {
             Configuration config = new Configuration("src/main/java/dai/config/config.json");
             SMTPClient client = new SMTPClient(config.getSmtpHost(), config.getSmtpPort());
 
-            List<Group> groups = Group.createGroups(config.getMinNumberOfEmailsPerGroup(), config.getMaxNumberOfEmailsPerGroup(), config.getNumberOfGroups(), config.getVictims());
+            List<Group> groups = Group.createGroups(config.getMinNumberOfEmailsPerGroup(), config.getMaxNumberOfEmailsPerGroup(), config.getNumberOfGroups(), config.getVictims(), config.getMessages());
 
             client.connect();
-
-
+           // client.sendEmails(groups, config.getMessages());
             client.close();
         }catch (Exception e) {
             System.out.println("Error: " + e.getMessage());

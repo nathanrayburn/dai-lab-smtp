@@ -47,6 +47,8 @@ public class Configuration {
 
         maxNumberOfEmailsPerGroup = (int)(double) jsonData.get("maxNumberOfEmailsPerGroup");
 
+        messageList = (List<Map<String, Object>>) jsonData.get("messages");
+
     }
 
     public List<String> getVictims() {
