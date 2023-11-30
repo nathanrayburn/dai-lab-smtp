@@ -1,8 +1,8 @@
 package dai.model;
 
 public class Message {
-    private String subject;
-    private String body;
+    final private String subject;
+    final private String body;
 
    public Message( String subject, String body) {
         this.subject = subject;

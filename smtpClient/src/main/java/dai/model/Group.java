@@ -5,9 +5,9 @@ import java.util.List;
 
 
 public class Group {
-    private String sender;
-    private List<String> recipients;
-    private Message message;
+    final private String sender;
+    final private List<String> recipients;
+    final private Message message;
 
     // Constructeur
     public Group(String sender, ArrayList<String> recipients, Message message) {
@@ -27,10 +27,6 @@ public class Group {
 
     public List<String> getRecipients() {
         return recipients;
-    }
-
-    public void setRecipients(List<String> recipients) {
-        this.recipients = recipients;
     }
     public static List<Group> createGroups(int minNumberOfEmailsPerGroup, int maxNumberOfEmailsPerGroup, int numberOfGroups, List<String> victims ,List<Message> messages){
         List<Group> groups = new ArrayList<>();

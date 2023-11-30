@@ -28,42 +28,52 @@
   ],
   "messages": [
     {
+      "id": 1,
       "subject": "Test Subject 1",
       "body": "Testing this message with a longer text. This is an example of a longer message with multiple sentences to showcase how the messages can be expanded with additional details and content.\n\nThis is just a demonstration to illustrate how the body of the message can contain more information and still be sent as part of the JSON structure."
     },
     {
+      "id": 2,
       "subject": "Test Subject 2",
       "body": "Exploring more content within this test message. Here's another paragraph to increase the length of this message. JSON structures like this can handle longer texts and various formatting options to suit the communication needs.\n\nFeel free to adjust the content length or structure as required for your specific use case."
     },
     {
+      "id": 3,
       "subject": "Random Subject 1",
       "body": "This is a randomly generated message. It contains additional content to showcase the flexibility of the message body within this JSON structure. You can modify this text to create diverse messages for different purposes and scenarios."
     },
     {
+      "id": 4,
       "subject": "Random Subject 2",
       "body": "Here's another randomly generated message for testing purposes. This message has been extended to demonstrate how the body of each message can vary in length and context.\n\nFeel free to experiment with different message lengths and styles to suit your needs."
     },
     {
+      "id": 5,
       "subject": "Random Subject 3",
       "body": "This is one more random message included in the list. The JSON structure allows for ample flexibility in the content, permitting longer messages or specific formatting as needed for your email communication."
     },
     {
+      "id": 6,
       "subject": "Random Subject 4",
       "body": "Adding yet another randomly generated message to this collection. These messages are formatted within the JSON structure to demonstrate how they can be modified, extended, or tailored to meet the requirements of your email sending process."
     },
     {
+      "id": 7,
       "subject": "Random Subject 5",
       "body": "Here's another message randomly created for your reference. This message can be expanded further or adjusted according to your preferences. Utilize this structure to create various types of messages for your testing or application purposes."
     },
     {
+      "id": 8,
       "subject": "Random Subject 6",
       "body": "Another one added to the mix! Feel free to modify or enhance this message according to your needs. The flexibility of the JSON structure allows for easy customization of messages tailored for different scenarios or applications."
     },
     {
+      "id": 9,
       "subject": "Random Subject 7",
       "body": "Yet another random message included in this set. Modify, extend, or personalize these messages to meet the specific requirements of your email sending process. Use this JSON format as a template for crafting your diverse range of messages."
     },
     {
+      "id": 10,
       "subject": "Random Subject 8",
       "body": "Adding to the pool of random messages with another entry. This JSON structure provides the foundation to create and send emails with varied content and styles. Experiment and adapt these messages to suit your intended communication purposes."
     }

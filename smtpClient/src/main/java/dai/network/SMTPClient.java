@@ -1,18 +1,19 @@
 package dai.network;
 
 import dai.model.Email;
-import dai.model.Message;
-import dai.model.Group;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
-import dai.config.Configuration;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
 
 public class SMTPClient {
-    private String smtpHost;
-    private int smtpPort;
+    private static final Logger LOGGER = Logger.getLogger(SMTPClient.class.getName());
+    private final String smtpHost;
+    private final int smtpPort;
     private Socket socket;
     private PrintWriter writer;
     private BufferedReader reader;
@@ -30,26 +31,26 @@ public class SMTPClient {
         socket = new Socket(smtpHost, smtpPort);
         writer = new PrintWriter(socket.getOutputStream(), true);
         reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        // Lire la réponse du serveur
         readResponse();
     }
 
     /**
      * Lit une réponse du serveur SMTP.
      */
-    private String readResponse() throws Exception {
+    private void readResponse() throws Exception {
         StringBuilder sb = new StringBuilder();
         String line;
         do {
             line = reader.readLine();
-            if (line == null) { // Si null, la connexion a été fermée inopinément
+            if (line == null) {
                 throw new Exception("La connexion au serveur SMTP a été perdue.");
             }
             sb.append(line).append("\n");
-        } while (!line.matches("^(220|250|354|221) .*") && !line.matches("^(4|5)[0-9]{2} .*"));
-        System.out.println("SMTP Response: " + sb.toString());
-        return sb.toString();
+        } while (!line.matches("^(220|250|354|221) .*") && !line.matches("^([45])[0-9]{2} .*"));
+
+        LOGGER.log(Level.INFO, "SMTP Response: {0}", sb.toString());
     }
+
 
     /**
      * Envoie une commande au serveur SMTP et lit la réponse.
@@ -83,7 +84,7 @@ public class SMTPClient {
         writer.print("\r\n");
         writer.print("Subject: " + subject + "\r\n");
         writer.print("\r\n");
-        writer.print(body + "\r\n"); // Here's the change made to remove "Body: "
+        writer.print(body + "\r\n");
         writer.print("\r\n");
         writer.flush();
         sendCommand(".");

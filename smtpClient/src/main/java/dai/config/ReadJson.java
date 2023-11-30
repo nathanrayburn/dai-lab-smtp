@@ -4,14 +4,13 @@ import java.io.FileReader;
 
 import java.util.Map;
 public class ReadJson {
-    public Map<String, Object> read(String pathToJson) {
+    public Map read(String pathToJson) {
 
         // try catch filereader
         try(FileReader reader = new FileReader(pathToJson)){
             // read json file
             Gson gson = new Gson();
-            Map<String, Object> map = gson.fromJson(reader, Map.class);
-            return map;
+            return gson.fromJson(reader, Map.class);
         }catch(Exception e){
             System.out.println("Error while reading file");
         }

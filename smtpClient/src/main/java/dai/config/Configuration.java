@@ -28,22 +28,22 @@ public class Configuration {
      * @param jsonFilePath Chemin vers le fichier JSON de configuration.
      */
     public Configuration(String jsonFilePath) {
-        // Lecture du contenu du fichier JSON
+
         ReadJson readJson = new ReadJson();
 
         Map<String, Object> jsonData = readJson.read(jsonFilePath);
 
         victims = (List<String>) jsonData.get("emails");
 
-        numberOfGroups= (int)(double) jsonData.get("numberOfGroups");
+        numberOfGroups = (int) (double) jsonData.get("numberOfGroups");
 
         smtpHost = (String) jsonData.get("smtpHost");
 
-        smtpPort = (int)(double) jsonData.get("smtpPort");
+        smtpPort = (int) (double) jsonData.get("smtpPort");
 
-        minNumberOfEmailsPerGroup = (int)(double) jsonData.get("minNumberOfEmailsPerGroup");
+        minNumberOfEmailsPerGroup = (int) (double) jsonData.get("minNumberOfEmailsPerGroup");
 
-        maxNumberOfEmailsPerGroup = (int)(double) jsonData.get("maxNumberOfEmailsPerGroup");
+        maxNumberOfEmailsPerGroup = (int) (double) jsonData.get("maxNumberOfEmailsPerGroup");
         messageList = new ArrayList<>();
         var msgList = (List<Map<String, Object>>) jsonData.get("messages");
         // TO DO check that message respect UTF 8
@@ -51,6 +51,12 @@ public class Configuration {
             Message msg = new Message((String) message.get("subject"), (String) message.get("body"));
             messageList.add(msg);
         }
+        try{
+            validate();
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+
     }
 
     public List<String> getVictims() {
@@ -84,46 +90,35 @@ public class Configuration {
     //endregion Accessors
 
     //region Methods
-    /**
-     * Valide la configuration chargée.
-     *
-     * @return true si la configuration est valide, false sinon.
-     */
-    public boolean validate() {
-        return validateEmails() && validateMessages();
+    public void validate() throws Exception {
+         validateEmails();
+         validateMessages();
     }
 
-    /**
-     * Valide les adresses e-mail.
-     *
-     * @return true si toutes les adresses e-mail sont valides, false sinon.
-     */
-    private boolean validateEmails() {
+    private void validateEmails() throws Exception {
         Pattern emailPattern = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
         for (String email : victims) {
             if (!emailPattern.matcher(email).matches()) {
                 System.out.println("Adresse e-mail invalide trouvée : " + email);
-                return false;
+                throw new Exception("Invalide e-mail address found : " + email);
             }
         }
-        return true;
     }
 
 
-    /**
-     * Valide les messages.
-     *
-     * @return true si tous les messages ont un sujet et un corps, false sinon.
-     */
-    private boolean validateMessages() {
+
+
+
+
+
+    private void validateMessages() throws Exception {
         for (Message message : messageList) {
             if (message.getSubject() == null || message.getBody() == null ||
-                    message.getSubject().toString().trim().isEmpty() || message.getBody().toString().trim().isEmpty()) {
-                System.out.println("Message invalide trouvé.");
-                return false;
+                    message.getSubject().trim().isEmpty() || message.getBody().trim().isEmpty()) {
+                throw new Exception("Invalide message : " + message.getSubject() + " " + message.getBody());
+
             }
         }
-        return true;
     }
     //endregion Methods
 }
