@@ -1,11 +1,7 @@
 package dai.config;
 import com.google.gson.*;
 import java.io.FileReader;
-import dai.model.Email;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 public class ReadJson {
     public Map<String, Object> read(String pathToJson) {

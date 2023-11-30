@@ -19,6 +19,12 @@ public class Main {
 
             client.connect();
            // client.sendEmails(groups, config.getMessages());
+
+            // Envoyer un e-mail à chaque groupe
+            for (Group group : groups) {
+                client.sendGroupEmail(group);
+            }
+
             client.close();
         }catch (Exception e) {
             System.out.println("Error: " + e.getMessage());

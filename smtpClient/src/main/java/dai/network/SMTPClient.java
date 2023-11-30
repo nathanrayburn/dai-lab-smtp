@@ -1,6 +1,6 @@
 package dai.network;
 
-import dai.model.Email;
+import dai.model.Message;
 import dai.model.Group;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -37,17 +37,25 @@ public class SMTPClient {
      * Lit une réponse du serveur SMTP.
      */
     private String readResponse() throws Exception {
-        String response = reader.readLine();
-        // Logique pour traiter la réponse ici
-        System.out.println("SMTP Response: " + response);
-        return response;
+        StringBuilder sb = new StringBuilder();
+        String line;
+        do {
+            line = reader.readLine();
+            if (line == null) { // Si null, la connexion a été fermée inopinément
+                throw new Exception("La connexion au serveur SMTP a été perdue.");
+            }
+            sb.append(line).append("\n");
+        } while (!line.matches("^(220|250|354|221) .*") && !line.matches("^(4|5)[0-9]{2} .*"));
+        System.out.println("SMTP Response: " + sb.toString());
+        return sb.toString();
     }
 
     /**
      * Envoie une commande au serveur SMTP et lit la réponse.
      */
     public void sendCommand(String command) throws Exception {
-        writer.println(command);
+        writer.print(command + "\r\n");
+        writer.flush();
         readResponse();
     }
 
@@ -55,18 +63,40 @@ public class SMTPClient {
      * Envoie un email via le serveur SMTP.
      */
     public void sendEmail(String from, List<String> recipients, String subject, String body) throws Exception {
-        sendCommand("HELO " + smtpHost);
+        sendCommand("EHLO " + smtpHost);
         sendCommand("MAIL FROM: <" + from + ">");
+
         for (String recipient : recipients) {
             sendCommand("RCPT TO: <" + recipient + ">");
         }
+
         sendCommand("DATA");
-        writer.println("Subject: " + subject);
-        writer.println();
-        writer.println(body);
-        writer.println(".");
-        readResponse();
-        sendCommand("QUIT");
+        writer.print("From: <" + from + ">" + "\r\n");
+        writer.print("To: ");
+        for(String recipient : recipients){
+            if(recipient.equals(recipients.get(recipients.size()-1)))
+                writer.print("<" + recipient + ">");
+            else
+                writer.print("<" + recipient + ">, ");
+        }
+        writer.print("\r\n");
+        writer.print("Subject: " + subject + "\r\n");
+        writer.print("\r\n");
+        writer.print(body + "\r\n"); // Here's the change made to remove "Body: "
+        writer.print("\r\n");
+        writer.flush();
+        sendCommand(".");
+    }
+
+
+
+
+    /**
+     * Envoie un email à un groupe entier.
+     */
+    public void sendGroupEmail(Group group) throws Exception {
+        var message = group.getMessage();
+        sendEmail(group.getSender(), group.getRecipients(), message.getSubject(), message.getBody());
     }
 
     /**

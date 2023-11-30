@@ -1,23 +1,22 @@
 package dai.config;
 
-import dai.model.Email;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import dai.model.Group;
+import dai.model.Message;
 
 /**
  * Classe pour gérer la configuration de l'application depuis un fichier JSON.
  */
 public class Configuration {
-    private List<String> victims;
-    List<Map<String, Object>> messageList;
-    private String smtpHost;
-    private int smtpPort;
-    private int numberOfGroups;
+    private final List<String> victims;
+    ArrayList<Message> messageList;
+    private final String smtpHost;
+    private final int smtpPort;
+    private final int numberOfGroups;
 
     private final int minNumberOfEmailsPerGroup;
     private final int maxNumberOfEmailsPerGroup;
@@ -27,9 +26,8 @@ public class Configuration {
      * Constructeur de la classe Configuration.
      *
      * @param jsonFilePath Chemin vers le fichier JSON de configuration.
-     * @throws Exception En cas d'erreur de lecture du fichier ou de parsing JSON.
      */
-    public Configuration(String jsonFilePath) throws Exception {
+    public Configuration(String jsonFilePath) {
         // Lecture du contenu du fichier JSON
         ReadJson readJson = new ReadJson();
 
@@ -46,16 +44,19 @@ public class Configuration {
         minNumberOfEmailsPerGroup = (int)(double) jsonData.get("minNumberOfEmailsPerGroup");
 
         maxNumberOfEmailsPerGroup = (int)(double) jsonData.get("maxNumberOfEmailsPerGroup");
-
-        messageList = (List<Map<String, Object>>) jsonData.get("messages");
-
+        messageList = new ArrayList<>();
+        var msgList = (List<Map<String, Object>>) jsonData.get("messages");
+        for (var message : msgList) {
+            Message msg = new Message((String) message.get("subject"), (String) message.get("body"));
+            messageList.add(msg);
+        }
     }
 
     public List<String> getVictims() {
         return victims;
     }
 
-    public List<Map<String, Object>> getMessages() {
+    public List<Message> getMessages() {
         return messageList;
     }
 
@@ -97,11 +98,10 @@ public class Configuration {
      * @return true si toutes les adresses e-mail sont valides, false sinon.
      */
     private boolean validateEmails() {
-        Pattern emailPattern = Pattern.compile("^.+@.+$");
+        Pattern emailPattern = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
         for (String email : victims) {
-            if (!emailPattern.matcher(email.toString()).matches()) {
+            if (!emailPattern.matcher(email).matches()) {
                 System.out.println("Adresse e-mail invalide trouvée : " + email);
-
                 return false;
             }
         }
@@ -115,9 +115,9 @@ public class Configuration {
      * @return true si tous les messages ont un sujet et un corps, false sinon.
      */
     private boolean validateMessages() {
-        for (var message : messageList) {
-            if (message.get("id").toString().isEmpty()|| message.get("subject").toString().isEmpty() ||
-                    message.get("body").toString().isEmpty()) {
+        for (Message message : messageList) {
+            if (message.getSubject() == null || message.getBody() == null ||
+                    message.getSubject().toString().trim().isEmpty() || message.getBody().toString().trim().isEmpty()) {
                 System.out.println("Message invalide trouvé.");
                 return false;
             }
