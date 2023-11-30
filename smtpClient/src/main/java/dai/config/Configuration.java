@@ -17,9 +17,9 @@ public class Configuration {
     private final String smtpHost;
     private final int smtpPort;
     private final int numberOfGroups;
-
     private final int minNumberOfEmailsPerGroup;
     private final int maxNumberOfEmailsPerGroup;
+
 
 
     /**

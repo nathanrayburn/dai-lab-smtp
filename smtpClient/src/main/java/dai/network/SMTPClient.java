@@ -1,5 +1,6 @@
 package dai.network;
 
+import dai.model.Email;
 import dai.model.Message;
 import dai.model.Group;
 import java.io.BufferedReader;
@@ -87,16 +88,11 @@ public class SMTPClient {
         writer.flush();
         sendCommand(".");
     }
-
-
-
-
     /**
      * Envoie un email à un groupe entier.
      */
-    public void sendGroupEmail(Group group) throws Exception {
-        var message = group.getMessage();
-        sendEmail(group.getSender(), group.getRecipients(), message.getSubject(), message.getBody());
+    public void sendGroupEmail(Email e) throws Exception {
+        sendEmail(e.getSender(), e.getRecipients(), e.getSubject(), e.getBody());
     }
 
     /**

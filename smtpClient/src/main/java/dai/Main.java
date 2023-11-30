@@ -8,6 +8,7 @@ import dai.network.SMTPClient;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import dai.model.Email;
 
 public class Main {
     public static void main(String[] args) {
@@ -17,12 +18,15 @@ public class Main {
 
             List<Group> groups = Group.createGroups(config.getMinNumberOfEmailsPerGroup(), config.getMaxNumberOfEmailsPerGroup(), config.getNumberOfGroups(), config.getVictims(), config.getMessages());
 
+            List<Email> emailList = Email.createEmails(groups);
+
             client.connect();
+
            // client.sendEmails(groups, config.getMessages());
 
             // Envoyer un e-mail à chaque groupe
-            for (Group group : groups) {
-                client.sendGroupEmail(group);
+            for (Email e : emailList ) {
+                client.sendGroupEmail(e);
             }
 
             client.close();

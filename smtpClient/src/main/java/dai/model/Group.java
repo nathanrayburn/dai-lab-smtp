@@ -25,10 +25,6 @@ public class Group {
         return sender;
     }
 
-    public void setSender(String sender) {
-        this.sender = sender;
-    }
-
     public List<String> getRecipients() {
         return recipients;
     }
