@@ -46,6 +46,7 @@ public class Configuration {
         maxNumberOfEmailsPerGroup = (int)(double) jsonData.get("maxNumberOfEmailsPerGroup");
         messageList = new ArrayList<>();
         var msgList = (List<Map<String, Object>>) jsonData.get("messages");
+        // TO DO check that message respect UTF 8
         for (var message : msgList) {
             Message msg = new Message((String) message.get("subject"), (String) message.get("body"));
             messageList.add(msg);
