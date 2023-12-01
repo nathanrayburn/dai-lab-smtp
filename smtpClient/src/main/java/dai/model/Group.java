@@ -1,6 +1,7 @@
 package dai.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -30,7 +31,8 @@ public class Group {
     }
     public static List<Group> createGroups(int minNumberOfEmailsPerGroup, int maxNumberOfEmailsPerGroup, int numberOfGroups, List<String> victims ,List<Message> messages){
         List<Group> groups = new ArrayList<>();
-
+        Collections.shuffle(victims);
+        Collections.shuffle(messages);
         try{
             // throw exeption if there are not enough victims to form groups
             if (victims.size() < numberOfGroups * minNumberOfEmailsPerGroup) {
@@ -52,8 +54,8 @@ public class Group {
                 ArrayList<String> selectedVictims = new ArrayList<>(victims.subList(startIndex, endIndex));
 
                 String sender = selectedVictims.remove(0);
-                // get random message
 
+                // get random message
                 Message message = messages.get((int) (Math.random() * messages.size()));
 
                 groups.add(new Group(sender, selectedVictims, message));

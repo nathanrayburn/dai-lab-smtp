@@ -1,13 +1,17 @@
 package dai.network;
 
 import dai.model.Email;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.regex.Pattern;
 
 
 public class SMTPClient {
@@ -15,7 +19,7 @@ public class SMTPClient {
     private final String smtpHost;
     private final int smtpPort;
     private Socket socket;
-    private PrintWriter writer;
+    private BufferedWriter writer;
     private BufferedReader reader;
 
     public SMTPClient(String smtpHost, int smtpPort) {
@@ -25,17 +29,19 @@ public class SMTPClient {
 
 
     /**
-     * Établit une connexion avec le serveur SMTP.
+     * This function is used to connect to the SMTP server
+     * @throws Exception if the connection to the SMTP server doesn't work
      */
     public void connect() throws Exception {
-        socket = new Socket(smtpHost, smtpPort);
-        writer = new PrintWriter(socket.getOutputStream(), true);
-        reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        readResponse();
+            socket = new Socket(smtpHost, smtpPort);
+            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+            Thread.sleep(200); // otherwise error INFO: SMTP Response: 421 509e6c73af57 You talk too soon, slow down.
     }
 
     /**
-     * Lit une réponse du serveur SMTP.
+     * This function is used to read the response from the SMTP server
+     * @throws Exception if the connection to the SMTP server is lost
      */
     private void readResponse() throws Exception {
         StringBuilder sb = new StringBuilder();
@@ -53,51 +59,86 @@ public class SMTPClient {
 
 
     /**
-     * Envoie une commande au serveur SMTP et lit la réponse.
+     * This function is used to send a command to the SMTP server
+     * @param command the command to send
+     * @throws Exception if the command is not recognized by the SMTP server
      */
-    public void sendCommand(String command) throws Exception {
-        writer.print(command + "\r\n");
+    private void sendCommand(String command) throws Exception {
+        writer.write(command + "\r\n");
         writer.flush();
         readResponse();
     }
 
     /**
-     * Envoie un email via le serveur SMTP.
+     * This function is used to email a group of recipients
+     * @param from the sender
+     * @param recipients the list of recipients
+     * @param subject the subject of the email
+     * @param body the body of the email
+     * @throws Exception if the email content does not respect SMTP DATA format
      */
     public void sendEmail(String from, List<String> recipients, String subject, String body) throws Exception {
         sendCommand("EHLO " + smtpHost);
         sendCommand("MAIL FROM: <" + from + ">");
-
         for (String recipient : recipients) {
             sendCommand("RCPT TO: <" + recipient + ">");
         }
-
         sendCommand("DATA");
-        writer.print("From: <" + from + ">" + "\r\n");
-        writer.print("To: ");
-        for(String recipient : recipients){
-            if(recipient.equals(recipients.get(recipients.size()-1)))
-                writer.print("<" + recipient + ">");
-            else
-                writer.print("<" + recipient + ">, ");
-        }
-        writer.print("\r\n");
-        writer.print("Subject: " + subject + "\r\n");
-        writer.print("\r\n");
-        writer.print(body + "\r\n");
-        writer.print("\r\n");
-        writer.flush();
+
+        sendEmailContent(from, recipients, subject, body);
+
         sendCommand(".");
     }
+
     /**
-     * Envoie un email à un groupe entier.
+     * This function is used to email a group of recipients
+     * @param from the sender
+     * @param recipients the list of recipients
+     * @param subject the subject of the email
+     * @param body  the body of the email
+     * @throws IOException if the email content does not respect SMTP DATA format
+     */
+
+    private void sendEmailContent(String from, List<String> recipients, String subject, String body) throws IOException {
+            StringBuilder emailContent = new StringBuilder();
+            emailContent.append("From: <").append(from).append(">\r\n");
+
+            emailContent.append("To: ");
+            for (int i = 0; i < recipients.size(); i++) {
+                emailContent.append("<").append(recipients.get(i)).append(">");
+                if (i != recipients.size() - 1) {
+                    emailContent.append(", ");
+                }
+            }
+            emailContent.append("\r\n");
+            emailContent.append("Subject: ").append(subject).append("\r\n");
+            emailContent.append("\r\n");
+            emailContent.append(body).append("\r\n");
+            emailContent.append("\r\n");
+            String smtpDataRegex = "(?s)^From: <[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}>\\r\\nTo: (<[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}>)(, <[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}>)*\\r\\nSubject: .+\\r\\n\\r\\n.+\\r\\n\\r\\n$";
+
+            if(Pattern.matches(smtpDataRegex, emailContent.toString())) {
+                LOGGER.log(Level.INFO, "SMTP DATA: {0}", emailContent.toString());
+            }
+            else {
+                throw new IOException("Error, email content does not respect SMTP DATA format");
+            }
+
+            writer.write(emailContent.toString());
+            writer.flush();
+    }
+    /**
+     * This function is used to email a group of recipients
+     * @param e the email to send
+     * @throws Exception if the email content does not respect SMTP DATA format
      */
     public void sendGroupEmail(Email e) throws Exception {
         sendEmail(e.getSender(), e.getRecipients(), e.getSubject(), e.getBody());
     }
 
     /**
-     * Ferme la connexion avec le serveur SMTP.
+     * This function is used to close the connection to the SMTP server
+     * @throws Exception Any exception that can be thrown by the socket
      */
     public void close() throws Exception {
         if (socket != null && !socket.isClosed()) {
