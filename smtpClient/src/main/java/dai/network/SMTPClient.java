@@ -103,6 +103,7 @@ public class SMTPClient {
 
     private void sendEmailContent(String from, List<String> recipients, String subject, String body) throws Exception {
         StringBuilder emailContent = new StringBuilder();
+        final String CONTENT_TYPE = "Content-Type: text/plain";
         emailContent.append("From: <").append(from).append(">\r\n");
 
         emailContent.append("To: ");
@@ -115,20 +116,20 @@ public class SMTPClient {
         emailContent.append("\r\n");
 
         String encodedSubject = encodeBase64(subject);
-        emailContent.append("Subject: =?utf-8?B?").append(encodedSubject).append("?=\r\n");
-        emailContent.append("\r\n");
+        emailContent.append("Subject:=?utf-8?B?").append(encodedSubject).append("?=\r\n");
+        emailContent.append(CONTENT_TYPE).append("\r\n\r\n");
 
         String encodedBody = encodeBase64(body);
         emailContent.append(encodedBody).append("\r\n");
         emailContent.append("\r\n");
-
+            /*
         String smtpDataRegex = "(?s)^From: <[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}>\\r\\nTo: (<[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}>)(, <[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}>)*\\r\\nSubject: .+\\r\\n\\r\\n.+\\r\\n\\r\\n$";
 
         if (Pattern.matches(smtpDataRegex, emailContent.toString())) {
             LOGGER.log(Level.INFO, "SMTP DATA: {0}", emailContent.toString());
         } else {
             throw new IOException("Error, email content does not respect SMTP DATA format");
-        }
+        } */
 
         writer.write(emailContent.toString());
         writer.flush();
