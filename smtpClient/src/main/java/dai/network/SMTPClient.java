@@ -32,16 +32,12 @@ public class SMTPClient {
      * @throws Exception if the connection to the SMTP server doesn't work
      */
     public void connect() throws Exception {
-            try(Socket socket = new Socket(smtpHost, smtpPort);
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
-                BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8))) {
-                this.socket = socket;
-                this.writer = writer;
-                this.reader = reader;
-                Thread.sleep(200); // otherwise error INFO: SMTP Response: 421 509e6c73af57 You talk too soon, slow down.
-            }catch (Exception e){
-                throw new Exception("La connexion au serveur SMTP a échoué.");
-            }
+        socket = new Socket(smtpHost, smtpPort);
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+        this.writer = writer;
+        this.reader = reader;
+        Thread.sleep(200); // otherwise error INFO: SMTP Response: 421 509e6c73af57 You talk too soon, slow down.
     }
 
     /**
@@ -93,7 +89,9 @@ public class SMTPClient {
 
         sendCommand("DATA");
 
-        prepareContent(from, recipients, subject, body);
+        writer.write(prepareContent(from, recipients, subject, body));
+
+        writer.flush();
 
         sendCommand(".");
     }
@@ -106,7 +104,7 @@ public class SMTPClient {
      * @param body the body of the email
      * @throws Exception if the email content does not respect SMTP DATA format
      */
-    public void prepareContent(String from, List<String> recipients, String subject, String body) throws Exception {
+    public String prepareContent(String from, List<String> recipients, String subject, String body) throws Exception {
         StringBuilder emailContent = new StringBuilder();
         final String encodedBody = encodeBase64(body);
         final String encodedSubject = encodeBase64(subject);
@@ -117,8 +115,7 @@ public class SMTPClient {
         buildContentTypeHeader(emailContent);
         buildBody(encodedBody, emailContent);
 
-        writer.write(emailContent.toString());
-        writer.flush();
+        return emailContent.toString();
     }
 
     /**
@@ -192,6 +189,7 @@ public class SMTPClient {
         sendEmail(e.getSender(), e.getRecipients(), e.getSubject(), e.getBody());
     }
 
+
     /**
      * This function is used to close the connection to the SMTP server
      * @throws Exception Any exception that can be thrown by the socket
@@ -207,7 +205,6 @@ public class SMTPClient {
             reader.close();
         }
     }
-
 }
 
 

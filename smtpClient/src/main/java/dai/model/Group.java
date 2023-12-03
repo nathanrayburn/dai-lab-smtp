@@ -35,8 +35,8 @@ public class Group {
         Collections.shuffle(messages);
         try{
             // throw exeption if there are not enough victims to form groups
-            if (victims.size() < numberOfGroups * minNumberOfEmailsPerGroup) {
-                throw new Exception("Error, not enough victims to form groups");
+            if (victims.size() < numberOfGroups * maxNumberOfEmailsPerGroup) {
+                throw new Exception("Error, not enough victims to form groups.\nNumber of groups : " + numberOfGroups + "\nMax number of emails per group : " + maxNumberOfEmailsPerGroup + "\nNumber of victims : " + victims.size() + "\n");
             }
             // random between min and max number of emails per group
             int groupSize = (int) (Math.random() * (maxNumberOfEmailsPerGroup - minNumberOfEmailsPerGroup)) + minNumberOfEmailsPerGroup;
@@ -63,7 +63,7 @@ public class Group {
 
             return groups;
         }catch(Exception e){
-            System.out.println(e+"\n");
+            System.out.println(e.getMessage()+"\n");
         }
         return null;
     }

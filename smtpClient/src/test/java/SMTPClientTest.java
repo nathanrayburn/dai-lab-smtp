@@ -28,7 +28,6 @@ public class SMTPClientTest {
     public void testConnect() {
         Exception exception = assertThrows(Exception.class, () -> client.connect());
         assertNotNull(exception);
-        // Note: Ce test échouera si le serveur SMTP n'est pas accessible
     }
 
     @Test
@@ -38,7 +37,6 @@ public class SMTPClientTest {
                 client.sendEmail("sender@example.com", recipients, "Subject", "Body")
         );
         assertNotNull(exception);
-        // Note: Ce test échouera si l'envoi de l'email ne fonctionne pas correctement
     }
 
     @Test
@@ -58,7 +56,6 @@ public class SMTPClientTest {
         String encodedText = client.encodeBase64(plainText);
         assertFalse(encodedText.isEmpty());
         assertNotEquals(plainText, encodedText);
-        // Vous pouvez également ajouter un test pour vérifier si le texte encodé est correctement décodé en retour
     }
 
     @Test
@@ -117,14 +114,34 @@ public class SMTPClientTest {
         Email email = new Email("sender@example.com", recipients, "Subject", "Body");
         Exception exception = assertThrows(Exception.class, () -> client.sendGroupEmail(email));
         assertNotNull(exception);
-        // Note: Ce test échouera si l'envoi du groupe d'e-mails ne fonctionne pas correctement
     }
+    @Test
+    public void testEmailContentFormat() {
+        // Create sample data for the email
+        SMTPClient client = new SMTPClient("smtp.example.com", 25);
+        String from = "sender@example.com";
+        List<String> recipients = Arrays.asList("recipient1@example.com", "recipient2@example.com");
+        String subject = "Test Subject";
+        String body = "Test body content";
 
+        try {
+
+            String sentContent = client.prepareContent(from, recipients, subject, body);
+            System.out.println(sentContent);
+            assertTrue(sentContent.contains("From: <" + from + ">"));
+            assertTrue(sentContent.contains("To: <recipient1@example.com>, <recipient2@example.com>"));
+            assertTrue(sentContent.contains("Subject:=?utf-8?B?")); // Checking subject encoding
+
+        } catch (Exception e) {
+            // Handle or log any exception that might occur during the test
+            e.printStackTrace();
+            fail("Exception occurred during test: " + e.getMessage());
+        }
+    }
     @Test
     public void testClose() {
         SMTPClient client = new SMTPClient("smtp.example.com", 25);
         assertDoesNotThrow(client::close);
-        // Ce test vérifie que la fermeture des ressources ne lance pas d'exception
     }
 }
 
