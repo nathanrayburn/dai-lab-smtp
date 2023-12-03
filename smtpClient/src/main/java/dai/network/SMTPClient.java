@@ -16,6 +16,7 @@ import java.util.Base64;
 
 public class SMTPClient {
     private static final Logger LOGGER = Logger.getLogger(SMTPClient.class.getName());
+    final String CONTENT_TYPE = "Content-Transfer-Encoding: base64";
     private final String smtpHost;
     private final int smtpPort;
     private Socket socket;
@@ -79,6 +80,7 @@ public class SMTPClient {
      */
     public void sendEmail(String from, List<String> recipients, String subject, String body) throws Exception {
         sendCommand("EHLO " + smtpHost);
+
         sendCommand("MAIL FROM: <" + from + ">");
 
         for (String recipient : recipients) {
@@ -87,25 +89,49 @@ public class SMTPClient {
 
         sendCommand("DATA");
 
-        sendEmailContent(from, recipients, subject, body);
+        prepareContent(from, recipients, subject, body);
 
         sendCommand(".");
     }
 
     /**
-     * This function is used to email a group of recipients
+     * This function is used to prepare the content of the email
      * @param from the sender
      * @param recipients the list of recipients
      * @param subject the subject of the email
-     * @param body  the body of the email
-     * @throws IOException if the email content does not respect SMTP DATA format
+     * @param body the body of the email
+     * @throws Exception if the email content does not respect SMTP DATA format
      */
-
-    private void sendEmailContent(String from, List<String> recipients, String subject, String body) throws Exception {
+    private void prepareContent(String from, List<String> recipients, String subject, String body) throws Exception {
         StringBuilder emailContent = new StringBuilder();
-        final String CONTENT_TYPE = "Content-Type: text/plain";
-        emailContent.append("From: <").append(from).append(">\r\n");
+        final String encodedBody = encodeBase64(body);
+        final String encodedSubject = encodeBase64(subject);
 
+        buildSenderHeader(from, emailContent);
+        buildRecipientHeaders(recipients, emailContent);
+        buildSubjectHeader(encodedSubject, emailContent);
+        buildContentTypeHeader(emailContent);
+        buildBody(encodedBody, emailContent);
+
+        writer.write(emailContent.toString());
+        writer.flush();
+    }
+
+    /**
+     * This function is used to build the sender header of the email
+     * @param from the sender
+     * @param emailContent the content of the email
+     */
+    private void buildSenderHeader(String from, StringBuilder emailContent) {
+        emailContent.append("From: <").append(from).append(">\r\n");
+    }
+
+    /**
+     * This function is used to build the recipients header of the email
+     * @param recipients the list of recipients
+     * @param emailContent the content of the email
+     */
+    private void buildRecipientHeaders(List<String> recipients, StringBuilder emailContent) {
         emailContent.append("To: ");
         for (int i = 0; i < recipients.size(); i++) {
             emailContent.append("<").append(recipients.get(i)).append(">");
@@ -114,25 +140,34 @@ public class SMTPClient {
             }
         }
         emailContent.append("\r\n");
+    }
 
-        String encodedSubject = encodeBase64(subject);
+    /**
+     * This function is used to build the subject header of the email
+     * @param encodedSubject the encoded subject of the email
+     * @param emailContent the content of the email
+     */
+    private void buildSubjectHeader(String encodedSubject, StringBuilder emailContent) {
         emailContent.append("Subject:=?utf-8?B?").append(encodedSubject).append("?=\r\n");
-        emailContent.append(CONTENT_TYPE).append("\r\n\r\n");
+    }
 
-        String encodedBody = encodeBase64(body);
+    /**
+     * This function is used to build the content type header of the email
+     * @param emailContent the content of the email
+     */
+    private void buildContentTypeHeader(StringBuilder emailContent) {
+        emailContent.append(CONTENT_TYPE).append("\r\n\r\n");
+    }
+
+    /**
+     * This function is used to build the body of the email
+     * @param encodedBody the encoded body of the email
+     * @param emailContent the content of the email
+     */
+
+    private void buildBody(String encodedBody, StringBuilder emailContent) {
         emailContent.append(encodedBody).append("\r\n");
         emailContent.append("\r\n");
-            /*
-        String smtpDataRegex = "(?s)^From: <[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}>\\r\\nTo: (<[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}>)(, <[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}>)*\\r\\nSubject: .+\\r\\n\\r\\n.+\\r\\n\\r\\n$";
-
-        if (Pattern.matches(smtpDataRegex, emailContent.toString())) {
-            LOGGER.log(Level.INFO, "SMTP DATA: {0}", emailContent.toString());
-        } else {
-            throw new IOException("Error, email content does not respect SMTP DATA format");
-        } */
-
-        writer.write(emailContent.toString());
-        writer.flush();
     }
 
     /**
