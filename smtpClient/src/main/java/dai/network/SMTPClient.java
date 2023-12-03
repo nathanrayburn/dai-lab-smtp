@@ -12,7 +12,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.regex.Pattern;
-import javax.mail.internet.MimeUtility;
+import java.util.Base64;
 
 public class SMTPClient {
     private static final Logger LOGGER = Logger.getLogger(SMTPClient.class.getName());
@@ -102,42 +102,47 @@ public class SMTPClient {
      */
 
     private void sendEmailContent(String from, List<String> recipients, String subject, String body) throws Exception {
-            StringBuilder emailContent = new StringBuilder();
-            emailContent.append("From: <").append(from).append(">\r\n");
+        StringBuilder emailContent = new StringBuilder();
+        emailContent.append("From: <").append(from).append(">\r\n");
 
-            emailContent.append("To: ");
-            for (int i = 0; i < recipients.size(); i++) {
-                emailContent.append("<").append(recipients.get(i)).append(">");
-                if (i != recipients.size() - 1) {
-                    emailContent.append(", ");
-                }
+        emailContent.append("To: ");
+        for (int i = 0; i < recipients.size(); i++) {
+            emailContent.append("<").append(recipients.get(i)).append(">");
+            if (i != recipients.size() - 1) {
+                emailContent.append(", ");
             }
-            emailContent.append("\r\n");
+        }
+        emailContent.append("\r\n");
 
+        String encodedSubject = encodeBase64(subject);
+        emailContent.append("Subject: =?utf-8?B?").append(encodedSubject).append("?=\r\n");
+        emailContent.append("\r\n");
 
-            String encodedSubject = MimeUtility.encodeText(subject, "utf-8", "B");
+        String encodedBody = encodeBase64(body);
+        emailContent.append(encodedBody).append("\r\n");
+        emailContent.append("\r\n");
 
-            emailContent.append("Subject: ").append(encodedSubject).append("\r\n");
-            emailContent.append("\r\n");
+        String smtpDataRegex = "(?s)^From: <[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}>\\r\\nTo: (<[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}>)(, <[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}>)*\\r\\nSubject: .+\\r\\n\\r\\n.+\\r\\n\\r\\n$";
 
-            String encodedBody = MimeUtility.encodeText(body, "utf-8", "B");
+        if (Pattern.matches(smtpDataRegex, emailContent.toString())) {
+            LOGGER.log(Level.INFO, "SMTP DATA: {0}", emailContent.toString());
+        } else {
+            throw new IOException("Error, email content does not respect SMTP DATA format");
+        }
 
-
-            emailContent.append(encodedBody).append("\r\n");
-            emailContent.append("\r\n");
-
-            String smtpDataRegex = "(?s)^From: <[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}>\\r\\nTo: (<[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}>)(, <[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}>)*\\r\\nSubject: .+\\r\\n\\r\\n.+\\r\\n\\r\\n$";
-
-            if(Pattern.matches(smtpDataRegex, emailContent.toString())) {
-                LOGGER.log(Level.INFO, "SMTP DATA: {0}", emailContent.toString());
-            }
-            else {
-                throw new IOException("Error, email content does not respect SMTP DATA format");
-            }
-
-            writer.write(emailContent.toString());
-            writer.flush();
+        writer.write(emailContent.toString());
+        writer.flush();
     }
+
+    /**
+     * This function is used to encode a string in base64
+     * @param text the string to encode
+     * @return the encoded string
+     *  */
+    private String encodeBase64(String text) {
+        return Base64.getEncoder().encodeToString(text.getBytes(StandardCharsets.UTF_8));
+    }
+
     /**
      * This function is used to email a group of recipients
      * @param e the email to send
