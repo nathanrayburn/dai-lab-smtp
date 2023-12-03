@@ -9,9 +9,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.regex.Pattern;
 import java.util.Base64;
 
 public class SMTPClient {
@@ -34,10 +32,16 @@ public class SMTPClient {
      * @throws Exception if the connection to the SMTP server doesn't work
      */
     public void connect() throws Exception {
-            socket = new Socket(smtpHost, smtpPort);
-            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
-            reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-            Thread.sleep(200); // otherwise error INFO: SMTP Response: 421 509e6c73af57 You talk too soon, slow down.
+            try(Socket socket = new Socket(smtpHost, smtpPort);
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8))) {
+                this.socket = socket;
+                this.writer = writer;
+                this.reader = reader;
+                Thread.sleep(200); // otherwise error INFO: SMTP Response: 421 509e6c73af57 You talk too soon, slow down.
+            }catch (Exception e){
+                throw new Exception("La connexion au serveur SMTP a échoué.");
+            }
     }
 
     /**

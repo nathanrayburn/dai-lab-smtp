@@ -30,16 +30,19 @@ public class Main {
 
             List<Group> groups = Group.createGroups(config.getMinNumberOfEmailsPerGroup(), config.getMaxNumberOfEmailsPerGroup(), config.getNumberOfGroups(), config.getVictims(), config.getMessages());
 
-            List<Email> emailList = Email.createEmails(groups);
+            if(groups == null) {
+                exitWithError("Error: not enough victims to create groups");
+            }else{
+                List<Email> emailList = Email.createEmails(groups);
 
-            client.connect();
+                client.connect();
 
-            // Envoyer un e-mail à chaque groupe
-            for (Email e : emailList ) {
-                client.sendGroupEmail(e);
+                for (Email e : emailList ) {
+                    client.sendGroupEmail(e);
+                }
+
+                client.close();
             }
-
-            client.close();
         }catch (Exception e) {
             exitWithError("Error: " + e.getMessage());
         }
