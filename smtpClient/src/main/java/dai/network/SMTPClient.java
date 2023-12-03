@@ -12,7 +12,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.regex.Pattern;
-
+import javax.mail.internet.MimeUtility;
 
 public class SMTPClient {
     private static final Logger LOGGER = Logger.getLogger(SMTPClient.class.getName());
@@ -80,9 +80,11 @@ public class SMTPClient {
     public void sendEmail(String from, List<String> recipients, String subject, String body) throws Exception {
         sendCommand("EHLO " + smtpHost);
         sendCommand("MAIL FROM: <" + from + ">");
+
         for (String recipient : recipients) {
             sendCommand("RCPT TO: <" + recipient + ">");
         }
+
         sendCommand("DATA");
 
         sendEmailContent(from, recipients, subject, body);
@@ -99,7 +101,7 @@ public class SMTPClient {
      * @throws IOException if the email content does not respect SMTP DATA format
      */
 
-    private void sendEmailContent(String from, List<String> recipients, String subject, String body) throws IOException {
+    private void sendEmailContent(String from, List<String> recipients, String subject, String body) throws Exception {
             StringBuilder emailContent = new StringBuilder();
             emailContent.append("From: <").append(from).append(">\r\n");
 
@@ -111,10 +113,19 @@ public class SMTPClient {
                 }
             }
             emailContent.append("\r\n");
-            emailContent.append("Subject: ").append(subject).append("\r\n");
+
+
+            String encodedSubject = MimeUtility.encodeText(subject, "utf-8", "B");
+
+            emailContent.append("Subject: ").append(encodedSubject).append("\r\n");
             emailContent.append("\r\n");
-            emailContent.append(body).append("\r\n");
+
+            String encodedBody = MimeUtility.encodeText(body, "utf-8", "B");
+
+
+            emailContent.append(encodedBody).append("\r\n");
             emailContent.append("\r\n");
+
             String smtpDataRegex = "(?s)^From: <[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}>\\r\\nTo: (<[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}>)(, <[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}>)*\\r\\nSubject: .+\\r\\n\\r\\n.+\\r\\n\\r\\n$";
 
             if(Pattern.matches(smtpDataRegex, emailContent.toString())) {
