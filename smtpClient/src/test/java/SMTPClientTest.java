@@ -127,7 +127,6 @@ public class SMTPClientTest {
         try {
 
             String sentContent = client.prepareContent(from, recipients, subject, body);
-            System.out.println(sentContent);
             assertTrue(sentContent.contains("From: <" + from + ">"));
             assertTrue(sentContent.contains("To: <recipient1@example.com>, <recipient2@example.com>"));
             assertTrue(sentContent.contains("Subject:=?utf-8?B?")); // Checking subject encoding
