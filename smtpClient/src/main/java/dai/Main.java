@@ -4,9 +4,6 @@ import dai.*;
 import dai.config.Configuration;
 import dai.model.Group;
 import dai.network.SMTPClient;
-
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import dai.model.Email;
 
