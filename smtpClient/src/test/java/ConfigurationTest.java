@@ -6,7 +6,7 @@ public class ConfigurationTest {
     public void testReadJsonFile() {
         try{
             Configuration configuration = new Configuration("src/main/java/dai/config/config.json");
-            configuration.validate();
+            configuration.validateConfiguration();
         }catch (Exception e){
             e.printStackTrace();
         }

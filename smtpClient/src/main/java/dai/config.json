@@ -1,8 +1,8 @@
 {
   "smtpHost": "localhost",
   "smtpPort": 1025,
-  "numberOfGroups": 6,
-  "minNumberOfEmailsPerGroup": 2,
+  "numberOfGroups": 4,
+  "minNumberOfEmailsPerGroup": 5,
   "maxNumberOfEmailsPerGroup": 5,
   "emails": [
     "email1@test.com",

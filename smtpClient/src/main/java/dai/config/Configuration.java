@@ -1,6 +1,5 @@
 package dai.config;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,7 @@ public class Configuration {
      *
      * @param jsonFilePath Chemin vers le fichier JSON de configuration.
      */
-    public Configuration(String jsonFilePath) {
+    public Configuration(String jsonFilePath) throws Exception{
 
         ReadJson readJson = new ReadJson();
 
@@ -44,19 +43,16 @@ public class Configuration {
         minNumberOfEmailsPerGroup = (int) (double) jsonData.get("minNumberOfEmailsPerGroup");
 
         maxNumberOfEmailsPerGroup = (int) (double) jsonData.get("maxNumberOfEmailsPerGroup");
+
         messageList = new ArrayList<>();
         var msgList = (List<Map<String, Object>>) jsonData.get("messages");
-        // TO DO check that message respect UTF 8
+
         for (var message : msgList) {
             Message msg = new Message((String) message.get("subject"), (String) message.get("body"));
             messageList.add(msg);
         }
-        try{
-            validate();
-        }catch(Exception e){
-            System.out.println(e.getMessage());
-        }
 
+        validateConfiguration();
     }
 
     public List<String> getVictims() {
@@ -90,10 +86,22 @@ public class Configuration {
     //endregion Accessors
 
     //region Methods
-    public void validate() throws Exception {
-         validateEmails();
-         validateMessages();
+
+    public void validateNbGroups() throws Exception {
+        if(minNumberOfEmailsPerGroup > maxNumberOfEmailsPerGroup){
+            throw new IllegalArgumentException("Minimum number of groups must be less than maximum number of groups");
+        }
+        if (victims.size() < numberOfGroups * maxNumberOfEmailsPerGroup) {
+            throw new Exception("Error, not enough victims to form groups.\nNumber of groups : " + numberOfGroups + "\nMax number of emails per group : " + maxNumberOfEmailsPerGroup + "\nNumber of victims : " + victims.size() + "\n");
+        }
     }
+
+    public void validateConfiguration() throws Exception {
+        validateEmails();
+        validateMessages();
+        validateNbGroups();
+    }
+
 
     private void validateEmails() throws Exception {
         Pattern emailPattern = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
