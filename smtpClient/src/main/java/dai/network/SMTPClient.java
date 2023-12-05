@@ -12,6 +12,10 @@ import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.util.Base64;
 
+/**
+ * Classe client pour interagir avec un serveur SMTP.
+ * Permet d'envoyer des e-mails via SMTP.
+ */
 public class SMTPClient {
     private static final Logger LOGGER = Logger.getLogger(SMTPClient.class.getName());
     final String CONTENT_TYPE = "Content-Transfer-Encoding: base64";
@@ -28,8 +32,8 @@ public class SMTPClient {
 
 
     /**
-     * This function is used to connect to the SMTP server
-     * @throws Exception if the connection to the SMTP server doesn't work
+     * Se connecte au serveur SMTP.
+     * @throws Exception En cas d'échec de la connexion.
      */
     public void connect() throws Exception {
         socket = new Socket(smtpHost, smtpPort);
@@ -41,8 +45,9 @@ public class SMTPClient {
     }
 
     /**
-     * This function is used to read the response from the SMTP server
-     * @throws Exception if the connection to the SMTP server is lost
+     * Lit la réponse du serveur SMTP.
+     *
+     * @throws Exception Si une erreur survient lors de la lecture de la réponse.
      */
     private void readResponse() throws Exception {
         StringBuilder sb = new StringBuilder();
@@ -60,9 +65,10 @@ public class SMTPClient {
 
 
     /**
-     * This function is used to send a command to the SMTP server
-     * @param command the command to send
-     * @throws Exception if the command is not recognized by the SMTP server
+     * Envoie une commande au serveur SMTP.
+     *
+     * @param command La commande à envoyer.
+     * @throws Exception Si une erreur survient lors de l'envoi de la commande.
      */
     private void sendCommand(String command) throws Exception {
         writer.write(command + "\r\n");
@@ -70,13 +76,118 @@ public class SMTPClient {
         readResponse();
     }
 
+
+
     /**
-     * This function is used to email a group of recipients
-     * @param from the sender
-     * @param recipients the list of recipients
-     * @param subject the subject of the email
-     * @param body the body of the email
-     * @throws Exception if the email content does not respect SMTP DATA format
+     * Prépare le contenu de l'e-mail à envoyer.
+     *
+     * @param from L'expéditeur de l'e-mail.
+     * @param recipients Les destinataires de l'e-mail.
+     * @param subject Le sujet de l'e-mail.
+     * @param body Le corps de l'e-mail.
+     * @return Le contenu de l'e-mail formaté.
+     * @throws Exception Si une erreur survient lors de la préparation du contenu.
+     */
+    public String prepareContent(String from, List<String> recipients, String subject, String body) throws Exception {
+        StringBuilder emailContent = new StringBuilder();
+        final String encodedBody = encodeBase64(body);
+        final String encodedSubject = encodeBase64(subject);
+
+        buildSenderHeader(from, emailContent);
+        buildRecipientHeaders(recipients, emailContent);
+        buildSubjectHeader(encodedSubject, emailContent);
+        buildContentTypeHeader(emailContent);
+        buildBody(encodedBody, emailContent);
+
+        return emailContent.toString();
+    }
+
+    /**
+     * Construit l'en-tête "From" de l'e-mail.
+     *
+     * @param from L'expéditeur de l'e-mail.
+     * @param emailContent Le StringBuilder pour le contenu de l'e-mail.
+     */
+    public void buildSenderHeader(String from, StringBuilder emailContent) {
+        emailContent.append("From: <").append(from).append(">\r\n");
+    }
+
+    /**
+     * Construit l'en-tête "To" de l'e-mail avec les destinataires.
+     *
+     * @param recipients Les destinataires de l'e-mail.
+     * @param emailContent Le StringBuilder pour le contenu de l'e-mail.
+     */
+    public void buildRecipientHeaders(List<String> recipients, StringBuilder emailContent) {
+        emailContent.append("To: ");
+        for (int i = 0; i < recipients.size(); i++) {
+            emailContent.append("<").append(recipients.get(i)).append(">");
+            if (i != recipients.size() - 1) {
+                emailContent.append(", ");
+            }
+        }
+        emailContent.append("\r\n");
+    }
+
+    /**
+     * Construit l'en-tête "Subject" de l'e-mail.
+     *
+     * @param encodedSubject Le sujet encodé de l'e-mail.
+     * @param emailContent Le StringBuilder pour le contenu de l'e-mail.
+     */
+    public void buildSubjectHeader(String encodedSubject, StringBuilder emailContent) {
+        emailContent.append("Subject:=?utf-8?B?").append(encodedSubject).append("?=\r\n");
+    }
+
+    /**
+     * Construit l'en-tête de type de contenu de l'e-mail.
+     *
+     * @param emailContent Le StringBuilder pour le contenu de l'e-mail.
+     */
+    public void buildContentTypeHeader(StringBuilder emailContent) {
+        emailContent.append(CONTENT_TYPE).append("\r\n\r\n");
+    }
+
+    /**
+     * Construit le corps de l'e-mail.
+     *
+     * @param encodedBody Le corps encodé de l'e-mail.
+     * @param emailContent Le StringBuilder pour le contenu de l'e-mail.
+     */
+
+    public void buildBody(String encodedBody, StringBuilder emailContent) {
+        emailContent.append(encodedBody).append("\r\n");
+        emailContent.append("\r\n");
+    }
+
+    /**
+     * Encode une chaîne en base64.
+     *
+     * @param text La chaîne à encoder.
+     * @return La chaîne encodée.
+     */
+    public String encodeBase64(String text) {
+        return Base64.getEncoder().encodeToString(text.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Envoie un e-mail à un groupe de destinataires.
+     *
+     * @param e L'e-mail à envoyer.
+     * @throws Exception Si une erreur survient lors de l'envoi de l'e-mail.
+     */
+    public void sendGroupEmail(Email e) throws Exception {
+        sendEmail(e.getSender(), e.getRecipients(), e.getSubject(), e.getBody());
+    }
+
+    /**
+     * Envoie un e-mail.
+     *
+     * @param from L'expéditeur de l'e-mail.
+     * @param recipients Les destinataires de l'e-mail.
+     * @param subject Le sujet de l'e-mail.
+     * @param body Le corps de l'e-mail.
+     * @throws Exception Si une erreur survient lors de l'envoi de l'e-mail.
      */
     public void sendEmail(String from, List<String> recipients, String subject, String body) throws Exception {
         sendCommand("EHLO " + smtpHost);
@@ -96,103 +207,11 @@ public class SMTPClient {
         sendCommand(".");
     }
 
-    /**
-     * This function is used to prepare the content of the email
-     * @param from the sender
-     * @param recipients the list of recipients
-     * @param subject the subject of the email
-     * @param body the body of the email
-     * @throws Exception if the email content does not respect SMTP DATA format
-     */
-    public String prepareContent(String from, List<String> recipients, String subject, String body) throws Exception {
-        StringBuilder emailContent = new StringBuilder();
-        final String encodedBody = encodeBase64(body);
-        final String encodedSubject = encodeBase64(subject);
-
-        buildSenderHeader(from, emailContent);
-        buildRecipientHeaders(recipients, emailContent);
-        buildSubjectHeader(encodedSubject, emailContent);
-        buildContentTypeHeader(emailContent);
-        buildBody(encodedBody, emailContent);
-
-        return emailContent.toString();
-    }
 
     /**
-     * This function is used to build the sender header of the email
-     * @param from the sender
-     * @param emailContent the content of the email
-     */
-    public void buildSenderHeader(String from, StringBuilder emailContent) {
-        emailContent.append("From: <").append(from).append(">\r\n");
-    }
-
-    /**
-     * This function is used to build the recipients header of the email
-     * @param recipients the list of recipients
-     * @param emailContent the content of the email
-     */
-    public void buildRecipientHeaders(List<String> recipients, StringBuilder emailContent) {
-        emailContent.append("To: ");
-        for (int i = 0; i < recipients.size(); i++) {
-            emailContent.append("<").append(recipients.get(i)).append(">");
-            if (i != recipients.size() - 1) {
-                emailContent.append(", ");
-            }
-        }
-        emailContent.append("\r\n");
-    }
-
-    /**
-     * This function is used to build the subject header of the email
-     * @param encodedSubject the encoded subject of the email
-     * @param emailContent the content of the email
-     */
-    public void buildSubjectHeader(String encodedSubject, StringBuilder emailContent) {
-        emailContent.append("Subject:=?utf-8?B?").append(encodedSubject).append("?=\r\n");
-    }
-
-    /**
-     * This function is used to build the content type header of the email
-     * @param emailContent the content of the email
-     */
-    public void buildContentTypeHeader(StringBuilder emailContent) {
-        emailContent.append(CONTENT_TYPE).append("\r\n\r\n");
-    }
-
-    /**
-     * This function is used to build the body of the email
-     * @param encodedBody the encoded body of the email
-     * @param emailContent the content of the email
-     */
-
-    public void buildBody(String encodedBody, StringBuilder emailContent) {
-        emailContent.append(encodedBody).append("\r\n");
-        emailContent.append("\r\n");
-    }
-
-    /**
-     * This function is used to encode a string in base64
-     * @param text the string to encode
-     * @return the encoded string
-     *  */
-    public String encodeBase64(String text) {
-        return Base64.getEncoder().encodeToString(text.getBytes(StandardCharsets.UTF_8));
-    }
-
-    /**
-     * This function is used to email a group of recipients
-     * @param e the email to send
-     * @throws Exception if the email content does not respect SMTP DATA format
-     */
-    public void sendGroupEmail(Email e) throws Exception {
-        sendEmail(e.getSender(), e.getRecipients(), e.getSubject(), e.getBody());
-    }
-
-
-    /**
-     * This function is used to close the connection to the SMTP server
-     * @throws Exception Any exception that can be thrown by the socket
+     * Ferme la connexion au serveur SMTP et les ressources associées.
+     *
+     * @throws Exception Si une erreur survient lors de la fermeture des ressources.
      */
     public void close() throws Exception {
         if (socket != null && !socket.isClosed()) {

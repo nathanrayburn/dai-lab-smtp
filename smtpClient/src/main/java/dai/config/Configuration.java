@@ -8,6 +8,8 @@ import dai.model.Message;
 
 /**
  * Classe pour gérer la configuration de l'application depuis un fichier JSON.
+ * Contient des paramètres de configuration tels que les adresses e-mail des victimes,
+ * les paramètres du serveur SMTP, le nombre de groupes, etc.
  */
 public class Configuration {
     private final List<String> victims;
@@ -22,8 +24,10 @@ public class Configuration {
 
     /**
      * Constructeur de la classe Configuration.
+     * Lit les données de configuration à partir d'un fichier JSON et initialise les champs.
      *
      * @param jsonFilePath Chemin vers le fichier JSON de configuration.
+     * @throws Exception Si une erreur survient lors de la lecture du fichier JSON.
      */
     public Configuration(String jsonFilePath) throws Exception{
 
@@ -86,6 +90,10 @@ public class Configuration {
 
     //region Methods
 
+    /**
+     * Valide le nombre de groupes basé sur les paramètres de configuration.
+     * @throws Exception Si la configuration n'est pas valide.
+     */
     public void validateNbGroups() throws Exception {
         if(minNumberOfEmailsPerGroup > maxNumberOfEmailsPerGroup){
             throw new IllegalArgumentException("Minimum number of groups must be less than maximum number of groups");
@@ -95,13 +103,20 @@ public class Configuration {
         }
     }
 
+    /**
+     * Valide l'ensemble de la configuration.
+     * @throws Exception Si la configuration n'est pas valide.
+     */
     public void validateConfiguration() throws Exception {
         validateEmails();
         validateMessages();
         validateNbGroups();
     }
 
-
+    /**
+     * Valide les adresses e-mail dans la liste des victimes.
+     * @throws Exception Si une adresse e-mail est invalide.
+     */
     private void validateEmails() throws Exception {
         Pattern emailPattern = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
         for (String email : victims) {
@@ -113,11 +128,10 @@ public class Configuration {
     }
 
 
-
-
-
-
-
+    /**
+     * Valide les messages dans la liste des messages.
+     * @throws Exception Si un message est invalide.
+     */
     private void validateMessages() throws Exception {
         for (Message message : messageList) {
             if (message.getSubject() == null || message.getBody() == null ||

@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
+/**
+ * Classe représentant un groupe avec un expéditeur, des destinataires et un message.
+ */
 public class Group {
     final private String sender;
     final private List<String> recipients;
@@ -17,18 +19,19 @@ public class Group {
         this.message = message;
     }
 
-    // Getters et Setters
 
-    public Message getMessage() {
-        return message;
-    }
-    public String getSender() {
-        return sender;
-    }
 
-    public List<String> getRecipients() {
-        return recipients;
-    }
+    /**
+     * Crée une liste de groupes basée sur les paramètres fournis.
+     * Mélange les listes de victimes et de messages et forme des groupes aléatoires.
+     *
+     * @param minNumberOfEmailsPerGroup Nombre minimum d'e-mails par groupe.
+     * @param maxNumberOfEmailsPerGroup Nombre maximum d'e-mails par groupe.
+     * @param numberOfGroups Nombre total de groupes à former.
+     * @param victims Liste des victimes (destinataires).
+     * @param messages Liste des messages disponibles.
+     * @return Liste des groupes créés ou null si une erreur se produit.
+     */
     public static List<Group> createGroups(int minNumberOfEmailsPerGroup, int maxNumberOfEmailsPerGroup, int numberOfGroups, List<String> victims ,List<Message> messages){
         List<Group> groups = new ArrayList<>();
         Collections.shuffle(victims);
@@ -36,7 +39,8 @@ public class Group {
         try{
 
             // random between min and max number of emails per group
-            int groupSize = (int) (Math.random() * (maxNumberOfEmailsPerGroup - minNumberOfEmailsPerGroup)) + minNumberOfEmailsPerGroup;
+            int groupSize = (int) (Math.random() * (maxNumberOfEmailsPerGroup - minNumberOfEmailsPerGroup))
+                    + minNumberOfEmailsPerGroup;
 
             for (int i = 0; i < numberOfGroups; i++) {
 
@@ -63,5 +67,17 @@ public class Group {
             System.out.println(e.getMessage()+"\n");
         }
         return null;
+    }
+
+    // Getters et Setters
+
+    public Message getMessage() {
+        return message;
+    }
+    public String getSender() {
+        return sender;
+    }
+    public List<String> getRecipients() {
+        return recipients;
     }
 }

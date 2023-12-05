@@ -1,5 +1,8 @@
 package dai.model;
 
+/**
+ * Classe représentant un message avec un sujet et un corps.
+ */
 public class Message {
     final private String subject;
     final private String body;

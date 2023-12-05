@@ -10,26 +10,46 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Classe de tests pour SMTPClient.
+ * Teste les différentes fonctionnalités du client SMTP.
+ */
 public class SMTPClientTest {
 
     private SMTPClient client;
 
+    /**
+     * Configuration initiale pour chaque test.
+     * Initialise un client SMTP avec des paramètres de test.
+     */
     @BeforeEach
     public void setUp() {
         client = new SMTPClient("smtp.example.com", 25);
     }
 
+    /**
+     * Nettoyage après chaque test.
+     * Ferme la connexion client SMTP.
+     */
     @AfterEach
     public void tearDown() throws Exception {
         client.close();
     }
 
+    /**
+     * Teste la connexion au serveur SMTP.
+     * Vérifie qu'une exception est lancée, ce qui indique une tentative de connexion.
+     */
     @Test
     public void testConnect() {
         Exception exception = assertThrows(Exception.class, () -> client.connect());
         assertNotNull(exception);
     }
 
+    /**
+     * Teste l'envoi d'un e-mail.
+     * Vérifie qu'une exception est lancée lors de l'envoi.
+     */
     @Test
     public void testSendEmail() {
         List<String> recipients = Arrays.asList("recipient@example.com");
@@ -39,6 +59,10 @@ public class SMTPClientTest {
         assertNotNull(exception);
     }
 
+    /**
+     * Teste la préparation du contenu de l'e-mail.
+     * Vérifie qu'une exception est lancée lors de la préparation du contenu.
+     */
     @Test
     public void testPrepareContent() {
         Exception exception = assertThrows(Exception.class, () ->
@@ -48,7 +72,10 @@ public class SMTPClientTest {
         // Ce test échouera si la préparation du contenu ne fonctionne pas comme prévu
     }
 
-
+    /**
+     * Teste l'encodage en base64.
+     * Vérifie que le texte encodé n'est pas vide et différent du texte original.
+     */
     @Test
     public void testEncodeBase64() {
         SMTPClient client = new SMTPClient("smtp.example.com", 25);
@@ -58,6 +85,10 @@ public class SMTPClientTest {
         assertNotEquals(plainText, encodedText);
     }
 
+    /**
+     * Teste la construction de l'en-tête du sujet de l'e-mail.
+     * Vérifie que le sujet encodé est inclus dans le contenu de l'e-mail.
+     */
     @Test
     public void testBuildSubjectHeader() {
         SMTPClient client = new SMTPClient("smtp.example.com", 25);
@@ -68,6 +99,10 @@ public class SMTPClientTest {
         assertTrue(emailContent.toString().contains(encodedSubject));
     }
 
+    /**
+     * Teste la construction du corps de l'e-mail.
+     * Vérifie que le corps encodé est inclus dans le contenu de l'e-mail.
+     */
     @Test
     public void testBuildBody() {
         SMTPClient client = new SMTPClient("smtp.example.com", 25);
@@ -78,6 +113,10 @@ public class SMTPClientTest {
         assertTrue(emailContent.toString().contains(encodedBody));
     }
 
+    /**
+     * Teste la construction des en-têtes des destinataires de l'e-mail.
+     * Vérifie que tous les destinataires sont inclus dans le contenu de l'e-mail.
+     */
     @Test
     public void testBuildRecipientHeaders() {
         SMTPClient client = new SMTPClient("smtp.example.com", 25);
@@ -89,6 +128,10 @@ public class SMTPClientTest {
         }
     }
 
+    /**
+     * Teste la construction de l'en-tête de l'expéditeur de l'e-mail.
+     * Vérifie que l'expéditeur est inclus dans le contenu de l'e-mail.
+     */
     @Test
     public void testBuildSenderHeader() {
         SMTPClient client = new SMTPClient("smtp.example.com", 25);
@@ -98,7 +141,10 @@ public class SMTPClientTest {
         assertTrue(emailContent.toString().contains(sender));
     }
 
-
+    /**
+     * Teste la construction de l'en-tête du type de contenu de l'e-mail.
+     * Vérifie que l'en-tête du type de contenu est correctement inclus.
+     */
     @Test
     public void testBuildContentTypeHeader() {
         SMTPClient client = new SMTPClient("smtp.example.com", 25);
@@ -107,6 +153,10 @@ public class SMTPClientTest {
         assertTrue(emailContent.toString().contains("Content-Transfer-Encoding: base64"));
     }
 
+    /**
+     * Teste l'envoi d'un e-mail à un groupe.
+     * Vérifie qu'une exception est lancée lors de l'envoi du groupe.
+     */
     @Test
     public void testSendGroupEmail() {
         SMTPClient client = new SMTPClient("smtp.example.com", 25);
@@ -115,6 +165,11 @@ public class SMTPClientTest {
         Exception exception = assertThrows(Exception.class, () -> client.sendGroupEmail(email));
         assertNotNull(exception);
     }
+
+    /**
+     * Teste le format du contenu de l'e-mail.
+     * Vérifie que le contenu de l'e-mail est correctement formaté.
+     */
     @Test
     public void testEmailContentFormat() {
         // Create sample data for the email
@@ -137,6 +192,11 @@ public class SMTPClientTest {
             fail("Exception occurred during test: " + e.getMessage());
         }
     }
+
+    /**
+     * Teste la fermeture du client SMTP.
+     * Vérifie qu'aucune exception n'est lancée lors de la fermeture.
+     */
     @Test
     public void testClose() {
         SMTPClient client = new SMTPClient("smtp.example.com", 25);

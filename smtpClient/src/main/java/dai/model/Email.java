@@ -3,8 +3,10 @@ package dai.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class
-Email {
+/**
+ * Classe représentant un e-mail avec un expéditeur, des destinataires, un sujet et un corps de message.
+ */
+public class Email {
     final private String sender;
     final private List<String> recipients;
     final private String subject;
@@ -17,10 +19,24 @@ Email {
         this.subject = subject;
         this.body = body;
     }
+
+    /**
+     * Crée un objet Email à partir d'un groupe.
+     *
+     * @param group Groupe à partir duquel créer l'e-mail.
+     * @return Email nouvellement créé.
+     */
     private static Email createEmail(Group group){
         Message msg = group.getMessage();
         return new Email(group.getSender(),group.getRecipients(), msg.getSubject(), msg.getBody());
     }
+
+    /**
+     * Crée une liste d'e-mails à partir d'une liste de groupes.
+     *
+     * @param groups Liste de groupes pour la création des e-mails.
+     * @return Liste des e-mails créés.
+     */
     public static List<Email> createEmails(List<Group> groups){
         List<Email> emailList = new ArrayList<>();
 
