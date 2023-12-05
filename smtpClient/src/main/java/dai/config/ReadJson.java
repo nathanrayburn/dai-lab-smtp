@@ -21,7 +21,7 @@ public class ReadJson {
     public Map read(String pathToJson) {
 
         // Bloc try-catch pour gérer les exceptions de lecture de fichier
-        try(FileReader reader = new FileReader(pathToJson)){
+        try(FileReader reader = new FileReader(pathToJson, java.nio.charset.StandardCharsets.UTF_8)){
             // Lecture et conversion du fichier JSON en Map
             Gson gson = new Gson();
             return gson.fromJson(reader, Map.class);
