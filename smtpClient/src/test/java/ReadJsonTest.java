@@ -15,8 +15,12 @@ public class ReadJsonTest {
     private static final String CONFIG_FILE_PATH = "src/main/java/dai/config/config.json";
 
     /**
-     * Teste la lecture d'un fichier JSON.
-     * Vérifie que les données JSON sont correctement lues et parsées.
+     * Teste la lecture d'un fichier JSON pour s'assurer que les données sont correctement extraites.
+     * Ce test vérifie que :
+     * - Le fichier JSON est correctement lu sans lancer d'exception.
+     * - Les clés essentielles (emails, numberOfGroups, messages) sont présentes dans le fichier JSON.
+     * - Les types de données pour chaque clé sont corrects (List pour emails et messages, Double pour numberOfGroups).
+     * - Les listes d'emails et de messages ne sont pas vides et chaque message contient les clés 'subject' et 'body'.
      */
     @Test
     public void testReadJsonFile() {

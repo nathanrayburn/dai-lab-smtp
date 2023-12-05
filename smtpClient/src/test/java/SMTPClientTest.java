@@ -172,25 +172,20 @@ public class SMTPClientTest {
      */
     @Test
     public void testEmailContentFormat() {
-        // Create sample data for the email
         SMTPClient client = new SMTPClient("smtp.example.com", 25);
         String from = "sender@example.com";
         List<String> recipients = Arrays.asList("recipient1@example.com", "recipient2@example.com");
         String subject = "Test Subject";
         String body = "Test body content";
 
-        try {
+        assertDoesNotThrow(() -> {
 
             String sentContent = client.prepareContent(from, recipients, subject, body);
             assertTrue(sentContent.contains("From: <" + from + ">"));
             assertTrue(sentContent.contains("To: <recipient1@example.com>, <recipient2@example.com>"));
-            assertTrue(sentContent.contains("Subject:=?utf-8?B?")); // Checking subject encoding
+            assertTrue(sentContent.contains("Subject:=?utf-8?B?"));
 
-        } catch (Exception e) {
-            // Handle or log any exception that might occur during the test
-            e.printStackTrace();
-            fail("Exception occurred during test: " + e.getMessage());
-        }
+        });
     }
 
     /**
