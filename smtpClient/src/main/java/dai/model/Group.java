@@ -69,7 +69,7 @@ public class Group {
         return null;
     }
 
-    // Getters et Setters
+    // region Accessors
 
     public Message getMessage() {
         return message;
@@ -80,4 +80,6 @@ public class Group {
     public List<String> getRecipients() {
         return recipients;
     }
+
+    // endregion Accessors
 }

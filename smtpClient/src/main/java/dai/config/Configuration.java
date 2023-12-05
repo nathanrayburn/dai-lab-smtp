@@ -58,6 +58,8 @@ public class Configuration {
         validateConfiguration();
     }
 
+    // region Accessors
+
     public List<String> getVictims() {
         return victims;
     }
@@ -66,7 +68,6 @@ public class Configuration {
         return messageList;
     }
 
-    //region Accessors
     public String getSmtpHost() {
         return smtpHost;
     }
@@ -86,9 +87,9 @@ public class Configuration {
         return maxNumberOfEmailsPerGroup;
     }
 
-    //endregion Accessors
+    // endregion Accessors
 
-    //region Methods
+    // region Methods
 
     /**
      * Valide le nombre de groupes basé sur les paramètres de configuration.
@@ -141,5 +142,5 @@ public class Configuration {
             }
         }
     }
-    //endregion Methods
+    // endregion Methods
 }

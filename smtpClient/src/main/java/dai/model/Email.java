@@ -45,7 +45,7 @@ public class Email {
         }
         return emailList;
     }
-    // Getters et Setters
+    // region Accessors
     public String getSender() {
         return sender;
     }
@@ -63,4 +63,6 @@ public class Email {
     public String getBody() {
         return body;
     }
+
+    // endregion Accessors
 }

@@ -12,6 +12,8 @@ public class Message {
         this.body = body;
     }
 
+    // region Accessors
+
     public String getSubject() {
         return subject;
     }
@@ -19,4 +21,6 @@ public class Message {
     public String getBody() {
         return body;
     }
+
+    // endregion Accessors
 }
