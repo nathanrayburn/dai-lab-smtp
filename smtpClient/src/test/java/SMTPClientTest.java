@@ -52,7 +52,7 @@ public class SMTPClientTest {
      */
     @Test
     public void testSendEmail() {
-        List<String> recipients = Arrays.asList("recipient@example.com");
+        List<String> recipients = List.of("recipient@example.com");
         Exception exception = assertThrows(Exception.class, () ->
                 client.sendEmail("sender@example.com", recipients, "Subject", "Body")
         );
@@ -66,7 +66,7 @@ public class SMTPClientTest {
     @Test
     public void testPrepareContent() {
         Exception exception = assertThrows(Exception.class, () ->
-                client.prepareContent("sender@example.com", Arrays.asList("recipient@example.com"), "Subject", "Body")
+                client.prepareContent("sender@example.com", List.of("recipient@example.com"), "Subject", "Body")
         );
         assertNotNull(exception);
         // Ce test échouera si la préparation du contenu ne fonctionne pas comme prévu
@@ -160,7 +160,7 @@ public class SMTPClientTest {
     @Test
     public void testSendGroupEmail() {
         SMTPClient client = new SMTPClient("smtp.example.com", 25);
-        List<String> recipients = Arrays.asList("recipient@example.com");
+        List<String> recipients = List.of("recipient@example.com");
         Email email = new Email("sender@example.com", recipients, "Subject", "Body");
         Exception exception = assertThrows(Exception.class, () -> client.sendGroupEmail(email));
         assertNotNull(exception);
